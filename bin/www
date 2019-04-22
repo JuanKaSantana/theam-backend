@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+'use strict';
+
+const dotenv = require('dotenv');
+const http = require('http');
+const { MongoClient } = require('mongodb');
+
+dotenv.config();
+
+const {
+    DB_NAME = 'theam',
+    MONGODB_URI = 'mongodb://localhost:27017',
+    SERVER_PORT = 5000,
+} = process.env;
+
+const mongoUrl = `${MONGODB_URI}/${DB_NAME}`;
+let server;
+
+Promise.all([
+    MongoClient.connect(mongoUrl)
+]).then((injections) => {
+    const db = injections[0];
+    const app = require('../app')(db);
+
+    app.set('port', SERVER_PORT);
+    app.set('trust proxy', 1);
+
+    server = http.createServer(app);
+    server.listen(SERVER_PORT);
+}).catch((err) => {
+    process.exit(1);
+});
