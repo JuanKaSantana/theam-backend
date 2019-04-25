@@ -4,7 +4,7 @@ RUN mkdir -p /usr/src/theam-backend
 
 WORKDIR /usr/src/theam-backend
 
-COPY package.json package-lock.json .
+COPY package.json package-lock.json ./
 
 RUN npm install --quiet
 
