@@ -1,17 +1,15 @@
-FROM node
+FROM mhart/alpine-node:8.11.4
 
-RUN mkdir -p /usr/src/theam-backend
+RUN mkdir /usr/src/theam-backend
 
 WORKDIR /usr/src/theam-backend
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
-RUN npm install --quiet
-
-RUN npm install nodemon -g --quiet
+RUN npm install
 
 COPY . .
 
-EXPOSE 8000
+EXPOSE 80
 
 CMD ["npm", "start"]
