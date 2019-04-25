@@ -1,11 +1,17 @@
-FROM node:8.7
+FROM node
+
+RUN mkdir -p /usr/src/theam-backend
 
 WORKDIR /usr/src/theam-backend
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .
 
-RUN npm install
+RUN npm install --quiet
 
-EXPOSE 80
+RUN npm install nodemon -g --quiet
+
+COPY . .
+
+EXPOSE 8000
 
 CMD ["npm", "start"]
