@@ -1,18 +1,8 @@
-FROM node:latest
+FROM node
 
-LABEL version="1.0"
-LABEL description="Backend API services developed on Express"
-LABEL maintainer "juancarlossantanadominguez@gmail.com"
+WORKDIR /usr/src/app
 
-RUN apt-get update
-
-RUN mkdir -p /usr/src/theam-backend
-RUN mkdir -p /var/log/node
-RUN chown node:node /var/log/node
-
-WORKDIR /usr/src/theam-backend
-
-COPY package.json ./
+COPY package.json .
 
 RUN npm install
 

@@ -1,18 +1,19 @@
-version: "2"
+version: '3'
 
 services:
-  theam-backend:
+  web:
     container_name: theam-backend
-    restart: always
-    build: .
+    build: ./
+    command: npm start
     ports:
-      - "3000:3000"
-    links:
-      - mongo
-  mongo:
-    container_name: mongo
-    image: mongo
+      - "5000:5000"
     volumes:
-      - ./data:/data/db
+      - ./app
+      - /usr/src/app/node_modules
+    depends_on:
+      - "mongo"
+
+  mongo:
+    image: mongo
     ports:
-      - "27017:27017"
+      - "27017:27017" 
