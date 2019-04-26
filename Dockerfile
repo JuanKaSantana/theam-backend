@@ -5,7 +5,6 @@ LABEL description="Backend API services developed on Express"
 LABEL maintainer "juancarlossantanadominguez@gmail.com"
 
 RUN apt-get update
-RUN apk add --no-cache bash coreutils grep sed
 
 RUN mkdir -p /usr/src/theam-backend
 RUN mkdir -p /var/log/node
