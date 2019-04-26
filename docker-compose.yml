@@ -1,42 +1,29 @@
-version: "2"
-services:
-    client:
-        image: mhart/alpine-node:6.8.0
-        restart: always
-        ports:
-            - "3000:3000"
-        working_dir: ../theam-frontend/src/app
-        volumes:
-            - ../theam-frontend:/theam-frontend
-        entrypoint: ["npm": "start"]
-        links:
-            - api
-        networks:
-            webappnetwork
-    api:
-        image: webapp-api
-        restart: always
-        ports:
-            - "9000:9000"
-        volumes:
-            - ./app:/app
-            - ./node_modules
-        depends_on:
-            - mongodb
-        networks:
-            webappnetwork
+version: '3'
 
-    mongodb:
-        image: mongo
-        restart: always
-        container_name: mongodb
-        volumes:
-            - ./data-node:/data/db
-        ports:
-            - 27017:27017
-        command: mongod --noauth --smallfiles
-        networks:
-            - webappnetwork
+services:
+  theam-backend:
+    image: juankasantana/theam-backend
+    ports:
+      - "5000:5000"
+    links:
+      - mongo
+      - theam-client
+    networks: 
+      - theam-client
+  theam-client:
+    image: juankasantana/theam-frontend
+    ports: 
+      - "80:80"
     networks:
-        webappnextwork:
-            drive: bridge
+      - theam-backend
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./data:/data/db
+    networks: 
+      - theam-backend
+networks:
+  theam-client:
+    driver: "bridge"

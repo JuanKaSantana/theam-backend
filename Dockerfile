@@ -1,15 +1,19 @@
-FROM mhart/alpine-node:8.11.4
+FROM node
 
-RUN mkdir /usr/src/theam-backend
+LABEL version="1.0"
+LABEL description="Backend services developed on Express"
+LABEL maintainer "juancarlossantanadominguez@gmail.com"
+
+RUN mkdir -p /usr/src/theam-backend
 
 WORKDIR /usr/src/theam-backend
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 RUN npm install
 
 COPY . .
 
-EXPOSE 80
+EXPOSE 5000
 
 CMD ["npm", "start"]
