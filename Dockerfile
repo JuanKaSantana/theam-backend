@@ -12,7 +12,7 @@ RUN chown node:node /var/log/node
 
 WORKDIR /usr/src/theam-backend
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 RUN npm install
 
