@@ -1,29 +1,18 @@
-version: '3'
+version: "2"
 
 services:
   theam-backend:
-    image: juankasantana/theam-backend
+    container_name: theam-backend
+    restart: always
+    build: .
     ports:
-      - "5000:5000"
+      - "3000:3000"
     links:
       - mongo
-      - theam-client
-    networks: 
-      - theam-client
-  theam-client:
-    image: juankasantana/theam-frontend
-    ports: 
-      - "80:80"
-    networks:
-      - theam-backend
   mongo:
-    image: mongo:latest
-    ports:
-      - "27018:27017"
+    container_name: mongo
+    image: mongo
     volumes:
       - ./data:/data/db
-    networks: 
-      - theam-backend
-networks:
-  theam-client:
-    driver: "bridge"
+    ports:
+      - "27017:27017"
