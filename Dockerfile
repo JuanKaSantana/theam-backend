@@ -1,4 +1,4 @@
-FROM node
+FROM node:latest
 
 WORKDIR /usr/src/app
 
@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["npm", "start"]
+ENTRYPOINT ["npm", "start"]

@@ -3,17 +3,23 @@ version: '3'
 services:
   web:
     container_name: theam-backend
-    build: ./
+    build: .
     command: npm start
     ports:
       - "5000:5000"
     volumes:
-      - ./app
+      - /usr/src/app
       - /usr/src/app/node_modules
+    networks:
+      - nodeapp-network
     depends_on:
       - "mongo"
-
   mongo:
     image: mongo
     ports:
       - "27017:27017" 
+    networks:
+      - nodeapp-network
+networks:
+  nodeapp-network:
+    driver: bridge
