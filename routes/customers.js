@@ -19,7 +19,7 @@ module.exports = (mongoService) => {
         const { id } = req.params;
 
         if (id.length !== 24) {
-            return res.status(422).json({ errorMessage: 'Invalid Id' });
+            return res.status(422).json();
         }
 
         const query = {
@@ -28,19 +28,19 @@ module.exports = (mongoService) => {
 
         customerCollection.find(query).toArray()
             .then(result => res.status(200).json({ customer: result[0] }))
-            .catch(() => res.status(500).json({ user: {}, errorMessage: "Something went wrong while getting customers." }));
+            .catch(() => res.status(500).json());
     });
 
     router.get('/search', validateToken, function (req, res) {
         customerCollection.find().toArray()
-        .then((result) => {
-            if (result.length > 0) {
-                res.status(200).json({ customers: result });
-            } else {
-                res.status(200).json({ customers: {}, errorMessage: "No customers found." });
-            }
-        })
-        .catch(err => res.status(500).json({ customers: {}, errorMessage: err }));
+            .then((result) => {
+                if (result.length > 0) {
+                    res.status(200).json({ customers: result });
+                } else {
+                    res.status(200).json({ customers: [] });
+                }
+            })
+            .catch(() => res.status(500).json());
     });
 
     router.post('/', validateToken, (req, res) => {
@@ -50,7 +50,7 @@ module.exports = (mongoService) => {
         const surname = _.get(customer, 'surname', null);
 
         if (!id || !name || !surname) {
-            return res.status(400).json({ errorMessage: 'Id, name and surname fields are required' });
+            return res.status(400).json();
         }
 
         _.set(customer, 'id', _.toLower(id));
@@ -70,24 +70,24 @@ module.exports = (mongoService) => {
                         newCustomer.creator = idUser;
                     }
                     customerCollection.insert(newCustomer)
-                        .then(() => res.status(200).json({ customer: newCustomer, message: 'Customer created successfully.' })); 
+                        .then(() => res.status(200).json({ customer: newCustomer, message: 'Customer created successfully.' }));
                 } else {
-                    res.status(500).json({ errorMessage: 'Customer already exists.' });
+                    res.status(409).json();
                 }
-                
+
             })
-            .catch(err => res.status(500).json({ errorMessage: err }));
+            .catch(() => res.status(500).json());
     });
 
     router.put('/', validateToken, (req, res) => {
         let { id, changeValues } = req.body;
 
         if (!id || !changeValues) {
-            return res.status(400).json({ errorMessage: 'id and changeValues fields are required' })
+            return res.status(400).json()
         }
 
         if (id.length !== 24) {
-            return res.status(422).json({ errorMessage: 'Invalid Id' });
+            return res.status(422).json();
         }
 
         const selectBy = {
@@ -105,12 +105,19 @@ module.exports = (mongoService) => {
             changeValues.lastUpdater = global.req.session.user._id;
         }
 
-        customerCollection.update(
-            selectBy,
-            { $set: changeValues },
-        )
-            .then(result => res.status(200).json(result))
-            .catch(err => res.status(500).json(err));
+        customerCollection.find({ id: changeValues.id }).toArray()
+            .then((result) => {
+                if (result.length > 0) {
+                    return res.status(409).json();
+                } else {
+                    customerCollection.update(
+                        selectBy,
+                        { $set: changeValues },
+                    )
+                        .then(result => res.status(200).json(result))
+                        .catch(() => res.status(500).json());
+                }
+            }) 
     });
 
 
@@ -118,11 +125,11 @@ module.exports = (mongoService) => {
         const { id } = req.params;
 
         if (!id) {
-            return res.status(400).json({ errorMessage: 'Id field is required' });
+            return res.status(400).json();
         }
 
         if (id.length !== 24) {
-            return res.status(422).json({ errorMessage: 'Invalid Id' });
+            return res.status(422).json();
         }
 
         const query = {
@@ -133,7 +140,7 @@ module.exports = (mongoService) => {
             customerCollection.deleteOne(query)
                 .then(res.status(200).json({ message: 'Customer deleted successfully.' }));
         } catch (e) {
-            res.status(500).json({ errorMessage: 'Something went wrong while deleting a customer' });
+            res.status(500).json();
         }
     });
 

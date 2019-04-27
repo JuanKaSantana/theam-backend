@@ -16,8 +16,12 @@ module.exports = (mongoService) => {
 
     router.get('/search/:id', validateToken, (req, res) => {
         const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json();
+        }
         if (id.length !== 24) {
-            return res.status(422).json({ errorMessage: 'Invalid Id' });
+            return res.status(422).json();
         }
         const query = {
             _id: ObjectID(req.sanitize(id)),
@@ -25,19 +29,13 @@ module.exports = (mongoService) => {
 
         userCollection.find(query).toArray()
             .then(result => res.status(200).json({ user: result[0] }))
-            .catch(() => res.status(500).json({ user: {}, errorMessage: "Something went wrong while getting users." }));
+            .catch(() => res.status(500).json());
     });
 
     router.get('/search', validateToken, (req, res) => {
         userCollection.find().toArray()
-            .then((result) => {
-                if (result.length > 0) {
-                    res.status(200).json({ users: result });
-                } else {
-                    res.status(200).json({ users: {}, errorMessage: "No users found." });
-                }
-            })
-            .catch(() => res.status(500).json({ users: {}, errorMessage: "Something went wrong while getting users." }));
+            .then(result => res.status(200).json({ users: result }))
+            .catch(() => res.status(500).json());
     });
 
     router.post('/', validateToken, (req, res) => {
@@ -47,7 +45,7 @@ module.exports = (mongoService) => {
         const password = _.get(user, 'password', null);
 
         if (!email || !password) {
-            return res.status(400).json({ errorMessage: 'Email and password fields are required' });
+            return res.status(400).json();
         }
 
         _.set(user, 'email', _.toLower(email));
@@ -61,28 +59,28 @@ module.exports = (mongoService) => {
             .then((result) => {
                 if (result.length === 0) {
                     bcrypt.hash(password, 10, function (err, hash) {
-                        if (err) { res.json({ errorMessage: err }) }
+                        if (err) { res.status(500).json() }
                         const newUser = _.merge(defaultUser, user);
                         _.set(newUser, 'password', hash);
                         userCollection.insert(newUser)
                             .then(() => res.status(200).json({ user: newUser, message: 'User created successfully.' }));
                     });
                 } else {
-                    res.status(500).json({ errorMessage: 'User already exists.' });
+                    res.status(409).json();
                 }
             })
-            .catch(err => res.status(500).json({ err, errorMessage: 'Something went wrong while addind new user' }));
+            .catch(() => res.status(500).json());
     });
 
     router.put('/', validateToken, (req, res) => {
         const { id, changeValues } = req.body;
 
         if (!id || !changeValues) {
-            return res.status(400).json({ errorMessage: 'id and changeValues fields are required' })
+            return res.status(400).json();
         }
 
         if (id.length !== 24) {
-            return res.status(422).json({ errorMessage: 'Invalid Id' });
+            return res.status(422).json();
         }
 
         const selectBy = {
@@ -99,8 +97,8 @@ module.exports = (mongoService) => {
             selectBy,
             { $set: changeValues },
         )
-            .then(result => res.json(result))
-            .catch(err => res.json(err));
+            .then(result => res.status(200).json(result))
+            .catch(() => res.status(500).json());
     });
 
 
@@ -108,7 +106,7 @@ module.exports = (mongoService) => {
         const { id } = req.params;
 
         if (id.length !== 24) {
-            return res.status(422).json({ errorMessage: 'Invalid Id' });
+            return res.status(422).json();
         }
 
         const query = {
@@ -119,7 +117,7 @@ module.exports = (mongoService) => {
             userCollection.deleteOne(query)
                 .then(res.status(200).json({ message: 'User deleted successfully.' }))
         } catch (e) {
-            res.status(500).json({ errorMessage: 'Something went wrong while deleting a user' });
+            res.status(500).json();
         }
     });
 

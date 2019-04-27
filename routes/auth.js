@@ -19,7 +19,7 @@ module.exports = (mongoService) => {
         const password = req.sanitize(_.get(req.body, 'password', null));
 
         if (!email || !password) {
-            return res.status(400).json({ errorMessage: 'Email and password fields are required' });
+            return res.status(400).json();
         }
 
         const query = { email };
@@ -27,12 +27,12 @@ module.exports = (mongoService) => {
         userCollection.find(query).toArray()
             .then((result) => {
                 if (result.length === 0) {
-                    return res.status(400).json({ status: 'Error', errorMessage: 'Wrong credentials' });
+                    return res.status(403).json();
                 } else {
                     const user = result[0];
                     bcrypt.compare(password, user.password, function (err, result) {
                         if (err) {
-                            return res.status(500).json({ errorMessage: err });
+                            return res.status(500).json();
                         }
 
                         if (result === true) {
@@ -46,14 +46,14 @@ module.exports = (mongoService) => {
                                 expiresIn: 60 * 60,
                             });
 
-                            return res.status(200).json({ status: 'OK', user, token });
+                            return res.status(200).json({ user, token });
                         } else {
-                            return res.status(400).json({ status: 'Error', errorMessage: 'Wrong credentials' });
+                            return res.status(403).json();
                         }
                     })
                 }
             })
-            .catch(err => res.json({ err, errorMessage: 'Something went wrong while login' }));
+            .catch(() => res.status(500).json());
     });
 
     router.post('/signup', (req, res) => {
@@ -63,7 +63,7 @@ module.exports = (mongoService) => {
         const password = req.sanitize(_.get(user, 'password', null));
 
         if (!email || !password) {
-            return res.status(400).json({ errorMessage: 'Email and password fields are required' });
+            return res.status(400).json();
         }
 
         _.set(user, 'email', _.toLower(email));
@@ -73,7 +73,7 @@ module.exports = (mongoService) => {
             .then((result) => {
                 if (result.length === 0) {
                     bcrypt.hash(password, 10, function (err, hash) {
-                        if (err) { res.status(400).json({ errorMessage: err }) }
+                        if (err) { res.status(500).json() }
                         const newUser = _.merge(defaultUser, user);
                         _.set(newUser, 'password', hash);
                         userCollection.insertOne(newUser)
@@ -90,14 +90,14 @@ module.exports = (mongoService) => {
                             });
                     });
                 } else {
-                    res.status(500).json({ errorMessage: 'User already exists.' });
+                    res.status(409).json();
                 }
             })
-            .catch(err => res.status(500).json({ err, errorMessage: 'Something went wrong while addind new user' }));
+            .catch(() => res.status(500).json());
     });
 
     router.get('/secure', validateToken, function (req, res) {
-        res.json({});
+        res.status(200).json({});
     });
 
     return router;

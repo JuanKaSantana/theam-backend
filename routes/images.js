@@ -9,14 +9,14 @@ module.exports = (mongoService) => {
         const id = req.sanitize(_.toLower(_.get(req.params, 'id', null)));
 
         if (!id) {
-            return res.status(400).json({ errorMessage: 'Id field is required' });
+            return res.status(400).json();
         }
 
         const query = { id };
 
         imagesCollection.find(query).toArray()
             .then((result) => res.status(200).json(result))
-            .catch(err => res.status(500).json({ err, errorMessage: 'Something went wrong' }));
+            .catch(() => res.status(500).json());
     });
 
     router.post('/upload', validateToken, (req, response) => {
@@ -24,7 +24,7 @@ module.exports = (mongoService) => {
         const image = _.get(req.body, 'image', null);
 
         if (!id || !image) {
-            return res.status(400).json({ errorMessage: 'Id and image fields are required' });
+            return res.status(400).json();
         }
 
         const query = { id };
@@ -36,11 +36,11 @@ module.exports = (mongoService) => {
                     { $set: { image } },
                 )
                     .then(result => response.status(200).json(result))
-                    .catch(err => response.status(500).json(err));
+                    .catch(() => response.status(500).json());
             } else {
                 imagesCollection.insert({ id, image })
                     .then(result => response.status(200).json(result))
-                    .catch(err => response.status(500).json({ err, errorMessage: 'Something went wrong' }));
+                    .catch(() => response.status(500).json());
             }
         });
     });
