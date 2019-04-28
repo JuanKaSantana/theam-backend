@@ -73,15 +73,6 @@ describe('Customers routes', () => {
                 .expect('Content-Type', /json/)
                 .expect(400, done);
         });
-
-        it('should return 400 on / if invalid id', (done) => {
-            request(app)
-                .put('/customers')
-                .send({ id: 'invalid id', changeValues: { name: 'newName' }})
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
-                .expect(422, done);
-        });
     });
 
     describe('DELETE', (done) => {
