@@ -6,14 +6,6 @@ const validateToken = require('../_helpers/tokenValidator.js').validateToken;
 
 module.exports = (mongoService) => {
     const customerCollection = mongoService.collection('customers');
-    const defaultCustomer = {
-        id: "",
-        name: "",
-        surname: "",
-        creator: '',
-        lastUpdater: "",
-        creationDate: moment().format().split('T')[0],
-    };
 
     router.get('/search/:id', validateToken, function (req, res) {
         const { id } = req.params;
@@ -64,11 +56,15 @@ module.exports = (mongoService) => {
         customerCollection.find(query).toArray()
             .then((result) => {
                 if (result.length === 0) {
-                    const newCustomer = _.merge(defaultCustomer, customer);
-                    const idUser = _.get(global, 'req.session.user._id', null);
-                    if (idUser) {
-                        newCustomer.creator = idUser;
-                    }
+                    const exampleUser = {
+                        id: "",
+                        name: "",
+                        surname: "",
+                        creator: _.get(global, 'req.session.user', null),
+                        lastUpdater: _.get(global, 'req.session.user', null),
+                        creationDate: moment().format().split('T')[0],
+                    };
+                    const newCustomer = _.merge(exampleUser, customer);
                     customerCollection.insert(newCustomer)
                         .then(() => res.status(200).json({ customer: newCustomer, message: 'Customer created successfully.' }));
                 } else {
@@ -86,28 +82,20 @@ module.exports = (mongoService) => {
             return res.status(400).json()
         }
 
-        if (id.length !== 24) {
-            return res.status(422).json();
-        }
-
-        const selectBy = {
-            _id: ObjectID(id),
-        };
+        const selectBy = { id };
 
         delete changeValues._id;
 
         Object.keys(changeValues).forEach((key) => {
             changeValues[key] = req.sanitize(changeValues[key]);
         });
+        
+        changeValues.lastUpdater = _.get(global, 'req.session.user', null);
 
-        const userId = _.get(global, 'req.session.user._id', null);
-        if (userId) {
-            changeValues.lastUpdater = global.req.session.user._id;
-        }
 
         customerCollection.find({ id: changeValues.id }).toArray()
             .then((result) => {
-                if (result.length > 0) {
+                if (result.length > 0 && changeValues.id !== id) {
                     return res.status(409).json();
                 } else {
                     customerCollection.update(
@@ -117,7 +105,7 @@ module.exports = (mongoService) => {
                         .then(result => res.status(200).json(result))
                         .catch(() => res.status(500).json());
                 }
-            }) 
+            })
     });
 
 

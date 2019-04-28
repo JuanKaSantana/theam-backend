@@ -36,7 +36,7 @@ module.exports = (mongoService) => {
                         }
 
                         if (result === true) {
-                            req.session.user = user;
+                            req.session.user = email;
                             global.req = req;
                             const tokenData = {
                                 user,
@@ -78,7 +78,8 @@ module.exports = (mongoService) => {
                         _.set(newUser, 'password', hash);
                         userCollection.insertOne(newUser)
                             .then((response) => {
-                                req.session.user = response.ops[0];
+                                req.session.user = user.email;
+                                global.req = req;
                                 const tokenData = {
                                     user,
                                 }

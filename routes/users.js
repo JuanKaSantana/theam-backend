@@ -60,7 +60,13 @@ module.exports = (mongoService) => {
                 if (result.length === 0) {
                     bcrypt.hash(password, 10, function (err, hash) {
                         if (err) { res.status(500).json() }
-                        const newUser = _.merge(defaultUser, user);
+                        const exampleUser = {
+                            email: '',
+                            password: '',
+                            admin: false,
+                            creationDate: moment().format().split('T')[0],
+                        };
+                        const newUser = _.merge(exampleUser, user);
                         _.set(newUser, 'password', hash);
                         userCollection.insert(newUser)
                             .then(() => res.status(200).json({ user: newUser, message: 'User created successfully.' }));
@@ -104,6 +110,10 @@ module.exports = (mongoService) => {
 
     router.delete('/:id', validateToken, (req, res) => {
         const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json();
+        }
 
         if (id.length !== 24) {
             return res.status(422).json();
