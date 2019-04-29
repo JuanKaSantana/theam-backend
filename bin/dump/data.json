@@ -1,9 +1,7 @@
 [
     {
-        "_id": ObjectId("5cc4d74beeccf30ad148bfdf"),
         "email": "admin@admin.com",
         "password": "$2b$10$43mG1fVae87LpVb8cZIw1ubYbDOfKkfklF0KBoyzd80iEJce/3tBS",
-        "admin": "true",
-        "creationDate": "2019-04-28"
+        "admin": "true"
     }
 ]
