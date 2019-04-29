@@ -10,6 +10,6 @@ COPY . .
 
 EXPOSE 5000
 
-ENTRYPOINT ["npm", "start"]
-
 CMD ["npm", "run", "seed"]
+
+ENTRYPOINT ["npm", "start"]
