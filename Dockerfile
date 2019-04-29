@@ -8,8 +8,8 @@ RUN npm install
 
 COPY . .
 
-CMD ["npm", "run", "seed"]
-
 EXPOSE 5000
 
 ENTRYPOINT ["npm", "start"]
+
+CMD ["npm", "run", "seed"]
