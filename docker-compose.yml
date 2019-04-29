@@ -1,25 +1,17 @@
-version: '3'
-
+version: "3"
 services:
-  web:
-    container_name: theam-backend
-    build: .
-    command: npm start
+  app:
+    container_name: express-mongo
+    restart: always
+    build: ./
     ports:
-      - "5000:5000"
+      - "80:3000"
     volumes:
-      - /usr/src/app
-      - /usr/src/app/node_modules
-    networks:
-      - nodeapp-network
-    depends_on:
-      - "mongo"
+      - .:/app
+    links:
+      - mongo
   mongo:
-    image: mongo:4.0.3
+    container_name: mongo
+    image: mongo
     ports:
-      - "27017:27017" 
-    networks:
-      - nodeapp-network
-networks:
-  nodeapp-network:
-    driver: bridge
+      - "27017:27017"
