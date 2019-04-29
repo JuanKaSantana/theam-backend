@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 "use strict";
 
-const fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
 const _ = require('lodash');
-
-let dbName = process.env.DB_NAME || 'theam';
-let mongoUrl = (process.env.MONGODB_URI || 'mongodb://localhost:27017/') + dbName;
-let fileName = './dump/data.json';
+const fileName = './dump/data.json';
 
 let db, data = {};
 
-module.exports = () => {
+module.exports = (mongoUrl) => {
     return Promise.all([
         MongoClient.connect(mongoUrl)
     ]).then(injections => {
