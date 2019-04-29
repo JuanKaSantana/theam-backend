@@ -5,7 +5,6 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon bin/www",
-    "seed": "node bin/importData",
     "test": "mocha --recursive --timeout 10000"
   },
   "author": "",

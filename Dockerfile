@@ -12,6 +12,4 @@ COPY .env.prod .env
 
 EXPOSE 5000
 
-CMD ["npm", "run", "seed"]
-
 ENTRYPOINT ["npm", "start"]
