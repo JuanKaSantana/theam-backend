@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+COPY .env.prod .env
+
 EXPOSE 5000
 
 CMD ["npm", "run", "seed"]
