@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN mongoimport --host mongo --port 27017 --db theam --collection users --mode upsert --type json --file /data/data.json --jsonArray
+CMD ["npm", "run", "seed"]
 
 EXPOSE 5000
 

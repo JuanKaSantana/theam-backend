@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon bin/www",
+    "seed": "mongoimport --host mongo --port 27017 --db theam --collection users --mode upsert --type json --file /data/data.json --jsonArray",
     "test": "mocha --recursive --timeout 10000"
   },
   "author": "",
@@ -26,6 +27,7 @@
     "mock-require": "^3.0.3",
     "moment": "^2.24.0",
     "mongodb": "2.2.33",
+    "mongoimport": "^1.0.6",
     "mongoose": "^5.5.2",
     "promise-retry": "^1.1.1",
     "sinon": "^7.3.2"
