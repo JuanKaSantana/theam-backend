@@ -20,10 +20,15 @@ module.exports = (mongoUrl) => {
     
         data.importFile = fileData;
         console.log('Retrieving current users in database...')
-        return db.collection('users').find().toArray();
+        return db.collection('users').find({ email: data.importFile[0].email }).toArray();
     
-    }).then(users => _.difference(data.importFile, users.map(t => t.name)).map(d => d)
-    ).then((usersToImport) => {
+    }).then((users) => {
+        if (users.length === 0) {
+            return data.importFile
+        }
+        return [];
+    
+    }).then((usersToImport) => {
     
         if(usersToImport.length == 0){
             console.log('Nothing to import.');
@@ -40,7 +45,6 @@ module.exports = (mongoUrl) => {
         }
     
         console.log('Finishing...');
-        process.exit(0);
     
     }).catch(err => {
     
